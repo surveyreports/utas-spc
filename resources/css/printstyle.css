@@ -1,15 +1,15 @@
 @font-face {
   font-family: "Boxed Book";
-  src: url("resources/fonts/BoxedBook.ttf");
+  src: url("../fonts/BoxedBook.ttf");
 }
 @font-face {
   font-family: "Boxed";
-  src: url("resources/fonts/BoxedRegular.ttf");
+  src: url("../fonts/BoxedRegular.ttf");
   font-weight: 400;
 }
 @font-face {
   font-family: "Boxed";
-  src: url("resources/fonts/BoxedRegularBold.ttf");
+  src: url("../fonts/BoxedRegularBold.ttf");
   font-weight: 700;
 }
 
@@ -39,11 +39,16 @@ body {
 .QuestionText {
   background-color: #ebebeb;
   width: max(1000px, 70%);
+  max-width: 100%;
 }
 .logo {
   display: block;
   text-align: right;
   background-color: #fff;
+}
+.logo img {
+  height: 40px;
+  margin: 5px 0;
 }
 #download-div {
   display: block;
