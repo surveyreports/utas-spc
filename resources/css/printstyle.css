@@ -29,13 +29,22 @@
   background-color: #fff;
 }
 
-body, .QuestionText {
+body {
   font-family: "Boxed", "Boxed Book", sans-serif;
   font-size: 18px;
-  background-color: rgb(235, 235, 235);
+  background-color: #fff;
   color: #333;
+  padding: 2em 0;
 }
-.logo { display: none; }
+.QuestionText {
+  background-color: #ebebeb;
+  width: max(1000px, 70%);
+}
+.logo {
+  display: block;
+  text-align: right;
+  background-color: #fff;
+}
 #download-div {
   display: block;
   padding: 5px 20px;
