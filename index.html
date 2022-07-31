@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <!-- ApexCharts -->
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+  <!-- PrintThis -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/printThis/1.15.0/printThis.min.js"></script>
+  <!-- FontAwesome -->
+  <script src="https://kit.fontawesome.com/1f08468d0e.js" crossorigin="anonymous"></script>
+  <!-- HTML2Canvas + jsPDF-->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <!-- custom stylesheet -->
+  <style>
+    @font-face {
+      font-family: "Boxed Book";
+      src: url("BoxedBook.ttf");
+    }
+    @font-face {
+      font-family: "Boxed";
+      src: url("BoxedRegular.ttf");
+      font-weight: 400;
+    }
+    @font-face {
+      font-family: "Boxed";
+      src: url("BoxedRegular-Bold.ttf");
+      font-weight: 700;
+    }
+    @media screen {
+      @media (min-width: 770px) {
+        .Skin .SkinInner {
+          width: 100% !important;
+        }
+      }
+      .Skin .SkinInner {
+        padding-top: 0 !important;
+      }
+      .Skin #SkinContent {
+        background-color: rgb(235, 235, 235);
+      }
+      .Skin #Buttons {
+        background-color: #fff;
+      }
+
+      body, .QuestionText {
+        font-family: "Boxed", "Boxed Book", sans-serif;
+        font-size: 18px;
+        background-color: rgb(235, 235, 235);
+        color: #333;
+        letter-spacing: 0.000001px;
+      }
+      .logo { display: none; }
+      #print-div {
+        display: block;
+        padding: 5px 20px;
+        font-size: 16px;
+        position: absolute;
+        right: 15px;
+        top: 3px;
+        z-index: 0;
+      }
+      #print-div:hover { cursor: pointer; }
+      main.report {
+        font-family: "Boxed", "Boxed Book", sans-serif !important;
+        font-size: 18px !important;
+        background-color: rgb(235, 235, 235);
+        color: #111;
+        width: max(900px, 60%);
+        max-width: min(900px, 100%);
+      }
+      .row.report-title {
+        text-align: center;
+        padding: 1rem min(5%, 40px);
+        color: #111;
+      }
+      .row {
+        padding-bottom: 1rem;
+      }
+
+      /* chart */
+      div#chart-container {
+        padding: 1em;
+        max-width: 600px;
+        margin: auto;
+      }
+      div#chart-container #polar-area-chart-print {
+        width: 250px;
+        margin: auto;
+        position: absolute;
+        top: 25%;
+        left: 25%;
+        z-index: -1;
+      }
+      div#chart-container .sector-label {
+        padding: 0.3em 0.8em;
+        background-color: #fff;
+        font-size: 1em;
+        font-weight: 700;
+        text-align: center;
+        line-height: 1.3em;
+        border-radius: 12px;
+        z-index: 2;
+      }
+
+      /* stage indicator */
+      main .row #stage-indicator-container {
+        display: flex;
+        padding: 1em;
+        max-width: 500px;
+        margin: auto;
+      }
+      table tr {
+        min-height: 5em;
+      }
+      table td {
+        padding: 5px;
+      }
+      main table.stages {
+        margin: auto;
+        width: 90%;
+        background-color: #eee;
+        border-collapse: separate;
+        border-spacing: 0 15px;
+        border-width: 0;
+      }
+      main table.stages tr.stage {
+        background-color: #111;
+        color: #eee;
+        opacity: 0.8;
+      }
+      main table.stages tr.stage.selected {
+        background-color: #fff;
+        color: #111;
+      }
+      main table.stages .stage-caption {
+        font-weight: 700;
+        width: 30%;
+        text-align: center;
+      }
+      main table.stages .stage-text {
+        font-weight: 400;
+        width: 70%;
+      }
+
+      /* report section */
+      .report-section-heading-top {
+        padding: 15px 10px;
+        color: #111;
+      }
+      .report-section-heading {
+        padding: 15px 10px;
+        color: rgba(246, 99, 13, 1);
+      }
+      .explanation-text {
+        text-align: left;
+        width: 97%;
+        display: none;
+        line-height: 1.5em;
+      }
+      .explanation-text.selected {
+        display: block;
+      }
+      .explanation-icon {
+        width: 40px;
+        margin: 0 15px;
+        opacity: 0.9;
+      }
+    }
+    @media print {
+      @page {
+        size: A4 portrait;
+      }
+      .logo { 
+        display: block;
+        text-align: right;
+        background-color: #fff;
+      }
+      .logo img {
+        height: 11mm!important;
+        padding: 2mm 0;
+      }
+      #print-div { display: none; }
+      body {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        letter-spacing: 0.000001px;
+      }
+      .QuestionText {
+        background-color: rgb(235, 235, 235);
+        height: 265mm;
+        width: 180mm;
+      }
+      main.report {
+        font-family: "Boxed", "Boxed Book", sans-serif !important;
+        font-size: 12px !important;
+        background-color: rgb(235, 235, 235);
+        color: #111;
+        width: 150mm;
+      }
+      .row.report-title {
+        text-align: center;
+        padding: 1rem min(5%, 40px) 0;
+        color: #111;
+      }
+      .row {
+        padding-bottom: 0.5em;
+      }
+
+      /* chart */
+      div#chart-container {
+        padding: 1em;
+        max-width: 50%;
+        margin: auto;
+        text-align: center;
+      }
+      div#chart-container #polar-area-chart {
+        margin: auto;
+        position: absolute;
+        z-index: -1;
+      }
+      div#chart-container #polar-area-chart-print {
+        width: 250px;
+        margin: auto;
+        position: static;
+        z-index: 1;
+      }
+      div#chart-container .sector-label {
+        background-color: #fff;
+        padding: 0.3em 0.8em;
+        font-size: 1em;
+        text-align: center;
+        line-height: 1.3em;
+        border-radius: 12px;
+        z-index: 2;
+      }
+
+      /* stage indicator */
+      main .row #stage-indicator-container {
+        display: flex;
+        padding: 1em;
+        max-width: 50%;
+        margin: auto;
+      }
+      table tr {
+        min-height: 5em;
+      }
+      table td {
+        padding: 5px;
+      }
+      main table.stages {
+        margin: auto;
+        width: 90%;
+        background-color: #eee;
+        border-collapse: separate;
+        border-spacing: 0 10px;
+        border-width: 0;
+      }
+      main table.stages tr.stage {
+        background-color: #111;
+        color: #eee;
+        opacity: 0.8;
+      }
+      main table.stages tr.stage.selected {
+        background-color: #fff;
+        color: #111;
+        opacity: 1;
+      }
+      main table.stages .stage-caption {
+        width: 30%;
+        text-align: center;
+      }
+      main table.stages .stage-text {
+        width: 70%;
+      }
+
+      /* report section */
+      main.report p {
+        margin-bottom: 0.5rem;
+      }
+      .report-section-heading-top {
+        padding: 0px 10px;
+        color: #111;
+        font-size: 1.2rem;
+        margin: 0.5rem 0;
+      }
+      .report-section-heading {
+        padding: 0px 10px;
+        color: rgba(246, 99, 13, 1);
+        font-size: 1.2rem;
+      }
+      .explanation-text {
+        text-align: left;
+        width: 97%;
+        display: none;
+      }
+      .explanation-text.selected {
+        display: block;
+      }
+      .explanation-icon {
+        width: 25px;
+        margin: 0 15px;
+        opacity: 0.9;
+      }
+    }
+
+  </style>
+
+  <!-- processing scores -->
+  <script>/** moved to Qualtrics Question JS **/</script>
+</head>
+
+<body>
+  <div class="QuestionText" style="margin:auto;">
+  <div class="logo"><img src="Utas-logo.jpg" /></div>
+  <div id="print-div" onclick="jQuery('.QuestionText').printThis({printDelay:1000});"><i class="fa-solid fa-print"></i> print report</div>
+  <main class="container report">
+    <div class="row report-title">
+      <div class="col-12">
+        <h1>Scenario Planning Capability</h1>
+      </div>
+    </div>
+
+    <div class="row report-figures">
+      <div id="chart-container" class="col-12 col-md-6">
+        <div style="display: block; position: relative;">
+          <div style="position:absolute; left:-13px; top:-10px; color:rgba(17, 17, 17, 1.0);" class="sector-label">governance</div>
+          <div style="position:absolute; right:-30px; top:-24px; color:rgba(107, 107, 107, 1.0);" class="sector-label">human capability</div>
+          <div style="position:absolute; right:0%; bottom:-5%; color:rgba(246, 99 ,13, 1.0);" class="sector-label">knowledge</div>
+          <div id="polar-area-chart"></div>
+          <div id="polar-area-chart-print"></div>
+        </div>
+      </div>
+
+      <div id="stage-indicator-container" class="col-12 col-md-6">
+        <table class="stages">
+          <tr class="stage stage1">
+            <td class="stage-caption">Stage 1</td>
+            <td class="stage-text">Building scenario planning capability</td>
+          </tr>
+          <tr class="stage stage2">
+            <td class="stage-caption">Stage 2</td>
+            <td class="stage-text">Experience of scenario planning capability</td>
+          </tr>
+          <tr class="stage stage3">
+            <td class="stage-caption">Stage 3</td>
+            <td class="stage-text">Organisational-wide scenario planning capability</td>
+          </tr>
+          <tr class="stage stage4">
+            <td class="stage-caption">Stage 4</td>
+            <td class="stage-text">Embedded a culture of scenario planning</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="row report-text">
+      <h3 class="report-section-heading-top">Organisational Snapshot</h3>
+      <div class="col-12">
+        <div class="explanation-text stage1">
+          <p>Congratulations, your organisation is currently at Stage 1 and in the early stages of building scenario planning capability.</p>
+          <p>You may wish to enhance the scenario planning capability of your organisation by adopting some of the possible treatment actions.</p>
+        </div>
+        <div class="explanation-text stage2">
+          <p>Congratulations, your organisation is currently at Stage 2 and has clearly demonstrated experience of scenario planning.</p>
+          <p>You may wish to enhance the scenario planning capability of your organisation by adopting some of the possible treatment actions.</p>
+        </div>
+        <div class="explanation-text stage3">
+          <p>Congratulations, your workplace is currently at Stage 3 and has organisational-wide scenario planning capability.</p>
+          <p>You may wish to further enhance the scenario planning capability of your organisation by adopting some of the possible treatment actions.</p>
+        </div>
+        <div class="explanation-text stage4">
+          <p>Congratulations, your organisation is currently at Stage 4 and has embedded a culture of scenario planning.</p>
+          <p>You may wish to further enhance the scenario planning capability of your organisation by adopting some of the possible treatment actions.</p>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <h3 class="report-section-heading">Human Capability<img class="explanation-icon" src = "https://curtin.au1.qualtrics.com/ControlPanel/Graphic.php?IM=IM_5bR6caRpv00BgfI" /></h3>
+      <div class="col-12">
+        <div class="explanation-text hstage1">
+          <p>Foster a workplace where people are encouraged to think outside the box. This will create a psychologically safe environment where people are willing to share new and potentially innovative ideas.</p>
+          <p>Introduce scenario planning to the leadership team by having a simple desktop discussion starting with the question: <em>What if…?</em> Encourage the team to think about how a potential disruption would affect the organisation, identifying both potential consequences and opportunities.</p>
+        </div>
+        <div class="explanation-text hstage2">
+          <p>Continue to foster an environment that supports people to think outside the box and encourage them to learn new thinking skills. Supporting the development of people with advanced human capabilities, such as creativity and critical thinking, will support higher-order intellectual activities and cultivate a balanced and productive hybrid workforce.</p>
+          <p>Ensure that the executive leadership and internal champions that are committed to scenario planning can facilitate the needed support. This will maintain the sustainability of effort.</p>
+        </div>
+        <div class="explanation-text hstage3">
+          <p>Consider bringing those with scenario planning expertise from across the organisation into dedicated central teams. This can create cognitively diverse teams who bring different perspectives allowing for the identification of threats and opportunities that others may miss.</p>
+          <p>Provide tailored human capability training specifically for the organisation’s scenario planning teams. Shared learning amongst the team can help bridge the skills gap and improve engagement and retention of planning expertise.</p>
+        </div>
+        <div class="explanation-text hstage4">
+          <p>Consider developing a shared learning approach to scenario planning using internal scenario planning expertise. This can enhance the human capabilities of the workforce, improving engagement and ensuring retention and broader socialisation of scenario planning knowledge. This can result in organisational-wide flexibility to meet unknown future challenges.</p>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <h3 class="report-section-heading">Knowledge<img class="explanation-icon" src = "https://curtin.au1.qualtrics.com/ControlPanel/Graphic.php?IM=IM_cwlNeI9cUdM7xLo" /></h3>
+      <div class="col-12">
+        <div class="explanation-text kstage1">
+          <p>Consider integrating people that possess some scenario planning knowledge strategically into project teams. This will allow the socialisation of scenario planning. It also has the benefit of allowing for the planning of multiple potential futures to be understood and used.</p>
+        </div>
+        <div class="explanation-text kstage2">
+          <p>Consider enhancing the knowledge of people that have an existing understanding of scenario planning techniques to include more sophisticated methodologies. This will build capacity in the organisation by increasing those with visionary competency.</p>
+        </div>
+        <div class="explanation-text kstage3">
+          <p>Consider how interdisciplinary teams with scenario planning knowledge and experience can inform policy content. This will lead to the development of evidence-informed policy ensuring that decision making is well-informed by the best available research evidence.</p>
+        </div>
+        <div class="explanation-text kstage4">
+          <p>Although team fluidity exists with scenario planning intra-organisationally, consider inter-organisational scenario planning partnerships with key stakeholders. Exploring plausible future scenarios at the macro level allows for the exploration of potentially wicked problems.</p>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <h3 class="report-section-heading">Governance<img class="explanation-icon" src = "https://i.imgur.com/Yh3QYAU.png" /></h3>
+      <div class="col-12">
+        <div class="explanation-text gstage1">
+          <p>Align all scenario planning activities with the broader organisational goals and objectives. This will ensure that any scenarios you develop can be used across the organisation to identify synergies and potential opportunities between different areas.</p>
+          <p>Consider repeating successful outcomes of scenario planning to build momentum and implementation across different processes.</p>
+        </div>
+        <div class="explanation-text gstage2">
+          <p>Consider formalising scenario planning structures and processes into existing policies. This will mean that any change in administration, personnel, or other organisational circumstance (e.g., budget) will not result in the deterioration of the current scenario planning capability.</p>
+          <p>Think about team-centric configurations that go beyond embedding individual scenario planning experts. This will commence the broader socialisation of scenario planning and commence the foundation for more formal scenario planning teams.</p>
+        </div>
+        <div class="explanation-text gstage3">
+          <p>Encourage flexible and adaptable organisational structures that facilitate scenario planning in business as usual activities. This will enable the broad engagement of individuals and teams. It will also lead to enhanced employee contribution and an increased ownership of scenario planning.</p>
+          <p>Consider enhancing existing policies that grow organisational capacity in scenario planning. Organisations that exhibit increased maturity for scenario planning can actualize probable and preferred future outcomes.</p>
+        </div>
+        <div class="explanation-text gstage4">
+          <p>Promote the organisational policies and processes for scenario planning across all levels and all areas of the organisation and encourage uptake in all business as usual activities. This enables the organisation to mature to a level of capability that supports institutionalisation of efforts, strengthening organisational well-being and sustaining scenario planning capability.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // process scores
+    function processScore(score) {
+      if(!score) { return 0; }
+      else { return isNaN(Number(score)) ? 0 : Number(score); }
+    }
+    const scores = {
+        k1: 6,
+        k2: 2,
+        h1: 7,
+        h2: 5,
+        h3: 4,
+        g1: 1,
+        g2: 2,
+        g3: 7,
+        g4: 4,
+        g5: 6
+      }
+      
+
+    // calc scores and stages
+    let totalScore = 0;
+    for (let s in scores) { totalScore += scores[s]; }
+    let stage = 1;
+    if (totalScore >= 0 && totalScore <= 20) { stage = 1; }
+    else if (totalScore >= 21 && totalScore <= 39) { stage = 2; }
+    else if (totalScore >= 40 && totalScore <= 59) { stage = 3; }
+    else if (totalScore >= 60 && totalScore <= 70) { stage = 4; }
+    else { stage = 1; }
+
+    let hScore = (scores.h1 + scores.h2 + scores.h3);
+    let hStage = 1;
+    if (hScore >= 0 && hScore <= 6) { hStage = 1; }
+    else if (hScore >= 7  && hScore <= 11) { hStage = 2; }
+    else if (hScore >= 12 && hScore <= 17) { hStage = 3; }
+    else if (hScore >= 18 && hScore <= 21) { hStage = 4; }
+    else { hStage = 1; }
+
+    let kScore = (scores.k1 + scores.k2);
+    let kStage = 1;
+    if (kScore >= 0 && kScore <= 3) { kStage = 1; }
+    else if (kScore >= 4 && kScore <= 7) { kStage = 2; }
+    else if (kScore >= 8 && kScore <= 11) { kStage = 3; }
+    else if (kScore >= 12 && kScore <= 14) { kStage = 4; }
+    else { kStage = 1; }
+
+    let gScore = (scores.g1 + scores.g2 + scores.g3 + scores.g4 + scores.g5);
+    let gStage = 1;
+    if (gScore >= 0 && gScore <= 10) { gStage = 1; }
+    else if (gScore >= 11 && gScore <= 19) { gStage = 2; }
+    else if (gScore >= 20 && gScore <= 29) { gStage = 3; }
+    else if (gScore >= 30 && gScore <= 35) { gStage = 4; }
+    else { gStage = 1; }
+
+    /** for debugging **/
+    // console.log({g: {score: gScore, stage: gStage}, k: {score:kScore, stage:kStage}, h: {score: hScore, stage:hStage}, overall: {score: totalScore, stage: stage}});
+
+    // display report
+    for (let s of document.getElementsByClassName("stage" + stage)) { s.classList.add("selected"); }
+    for (let s of document.getElementsByClassName("hstage" + hStage)) { s.classList.add("selected"); }
+    for (let s of document.getElementsByClassName("kstage" + kStage)) { s.classList.add("selected"); }
+    for (let s of document.getElementsByClassName("gstage" + gStage)) { s.classList.add("selected"); }
+
+    // generate chart
+    const colors = {g:'#111111', k:'#f6630d', h:'#7c7c7c', bg:'#ebebeb'};
+    const options = {
+      series: [scores.h1, scores.h2, scores.h3, scores.k1, scores.k2, scores.g1, scores.g2, scores.g3, scores.g4, scores.g5],
+      labels: [
+        'Creativity',
+        'Critical thinking',
+        'Leadership',
+        'Possession of knowledge',
+        'Application of knowledge',
+        'Roles',
+        'Structures',
+        'Plans & policies',
+        'Processes',
+        'Financial'
+      ],
+      chart: {
+        type: 'polarArea',
+        background: colors.bg,
+        fontFamily: 'Boxed, Helvetica, Arial, sans-serif'
+      },
+      stroke: {
+        colors: [colors.bg],
+        width: 1
+      },
+      fill: {
+        opacity: 0.98
+      },
+      colors: [colors.h, colors.h, colors.h, colors.k, colors.k, colors.g, colors.g, colors.g, colors.g, colors.g],
+      legend: {
+        show: false,
+        position: 'bottom'
+      },
+      yaxis: {
+        max: 7,
+        crosshairs: { show: false }
+      },
+      plotOptions: {
+        polarArea: {
+          rings: {
+            strokeWidth: 1,
+            strokeColor: '#ddd',
+          },
+          spokes: {
+            strokeWidth: 1,
+            connectorColors: '#ddd',
+          }
+        }
+      }
+    };
+
+    const polarAreaChart = new ApexCharts(document.getElementById('polar-area-chart'), options);
+    const pacPrint = new ApexCharts(document.getElementById('polar-area-chart-print'), options);
+    polarAreaChart.render();
+    pacPrint.render();
+  </script>
+  </div>
+</body>
+
+</html>
