@@ -39,11 +39,12 @@ body {
   background-color: #fff;
   color: #333;
   padding: 2em 0;
+  overflow-x: hidden;
 }
 .QuestionText {
   background-color: #ebebeb;
   width: max(1000px, 70%);
-  max-width: 100%;
+  max-width: calc(100% - 15px);
 }
 .logo {
   display: block;
