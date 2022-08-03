@@ -64,6 +64,8 @@ polarAreaChart.render();
 pacPrint.render();
 
 function savePDF() {
+  document.getElementById("download-div").disabled = true;
+  document.body.classList.add("busy");
   const options = {
     scale:3, windowWidth:2000, windowHeight:1000, letterRendering: true, allowTaint: false, useCORS: false,
     onclone: function (doc) {
@@ -76,6 +78,8 @@ function savePDF() {
       let imgdata = canvas.toDataURL("image/jpeg", 1.0);
       let doc = new jspdf.jsPDF();
       doc.addImage(imgdata, "JPEG", 15, 10, 180, 277,"img","NONE");
+      document.getElementById("download-div").disabled = false;
+      document.body.classList.remove("busy");
       doc.save("Scenario Planning Capability Report.pdf");
   });
 }

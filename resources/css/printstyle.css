@@ -41,6 +41,9 @@ body {
   padding: 2em 0;
   overflow-x: hidden;
 }
+body.busy:hover {
+  cursor: progress;
+}
 .QuestionText {
   background-color: #ebebeb;
   width: max(1000px, 70%);
@@ -56,12 +59,19 @@ body {
   margin: 5px 0;
 }
 #download-div {
-  display: block;
+  display: inline;
   padding: 5px 20px;
   font-size: 16px;
   text-align: center;
+  background-color: #fff;
+  color: #111;
 }
 #download-div:hover { cursor: pointer; }
+#download-div:disabled {
+  color: #666;
+  background-color: rgba(255,255,255,0.7);
+}
+body.busy #download-div:hover { cursor: progress; }
 main.report {
   font-family: "Boxed", "Boxed Book", sans-serif !important;
   font-size: 18px !important;
